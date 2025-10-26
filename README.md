@@ -1,16 +1,35 @@
-# React + Vite
+# Leftover
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This web app is designed to help housemates to track their household food inventory, reduce waste and save money by cooking together. 
 
-Currently, two official plugins are available:
+The app is intended to be written on an NFC tag and to be put on your fridge for easy access. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- Tracks all food items with expiry dates
+- Shared shopping list for the household
+- Suggested recipes with available ingredients
+- Suggested recipes based on collective household ingredients to encourage housemates to cook together
 
-## React Compiler
+## Built with
+- Javascript/HTML/CSS
+- React
+- Vite
+- Tailwind CSS
+- Lucide React
+- Vercel
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Future development
+- Functional/live dashoboard metrics
+- Recipe database/AI integration
+- Barcode scanning
+- Mobile app
 
-## Expanding the ESLint configuration
+## Try it out
+Prototype: [Leftover App](https://leftover-app.vercel.app/) 
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Here is a guide to interact with the app, see if you can complete these tasks: 
+1. Sign up: Decide on house name. Add at least 2 housemates. If you currently live in sharehouse, feel free to recreate it.
+2. Navigate to your fridge and add at least 1 ingredient for each housemate.
+3. Navigate to shopping list and add at least 1 item. 
+4. Navigate to suggested recipes and observe. If there are any recipes, mark 1 as already cooked.
+5. Navigate to cook together and observe. If there are any collaborative recipes, mark 1 as already cooked together.
