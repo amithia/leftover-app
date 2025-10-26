@@ -237,7 +237,7 @@ export default function LeftoverApp() {
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-[#B8D4A8] rounded-full mb-4 shadow-lg">
-              <Home className="w-10 h-10 text-black" />
+              <Leaf className="w-10 h-10 text-black" />
             </div>
             <h1 className="text-5xl font-black mb-2" style={{ 
               background: 'linear-gradient(135deg, #7FA86F 0%, #6B9A5E 100%)',
