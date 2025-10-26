@@ -1,6 +1,10 @@
-import { useState } from 'react';
-import { Plus, Trash2, Calendar, Package, Users, ShoppingCart, ChefHat, Home, Settings, TrendingUp, Leaf, X, Check, Salad, Apple, Milk, Drumstick, Wheat, UtensilsCrossed, Edit2 } from 'lucide-react';
+//imports
+import {useState} from 'react';
 
+// icons
+import {Plus, Trash2, Calendar, Package, Users, ShoppingCart, ChefHat, Home, Settings, TrendingUp, Leaf, X, Check, Salad, Apple, Milk, Drumstick, Wheat, UtensilsCrossed} from 'lucide-react';
+
+//main function
 export default function LeftoverApp() {
 
   const [currentView, setCurrentView] = useState('dashboard');
@@ -12,18 +16,16 @@ export default function LeftoverApp() {
   const [consumedItems, setConsumedItems] = useState([]);
   const [cookedRecipes, setCookedRecipes] = useState([]);
   const [collabMeals, setCollabMeals] = useState([]);
-  
   const [showForm, setShowForm] = useState(false);
   const [showAddMember, setShowAddMember] = useState(false);
-  const [showConsumedList, setShowConsumedList] = useState(false);
   const [showShoppingForm, setShowShoppingForm] = useState(false);
-  
-
   const [newMemberName, setNewMemberName] = useState('');
   const [houseName, setHouseName] = useState('');
-  const [tempMembers, setTempMembers] = useState(['']); // For signup flow
+  const [tempMembers, setTempMembers] = useState(['']);
   const [shoppingItemName, setShoppingItemName] = useState('');
   const [shoppingBuyer, setShoppingBuyer] = useState('');
+
+  // fridge item
   const [newItem, setNewItem] = useState({
     name: '',
     quantity: '',
@@ -32,53 +34,63 @@ export default function LeftoverApp() {
     addedBy: ''
   });
   
+  //add new item to fridge
   const addFridgeItem = () => {
+    //checking name + quanityty + addedBy
     if (newItem.name && newItem.quantity && newItem.addedBy) {
       const item = {
+        // unique id
         id: Date.now(),
         ...newItem,
         addedDate: new Date().toISOString()
       };
       setFridgeItems([...fridgeItems, item]);
       setNewItem({ name: '', quantity: '', expiryDate: '', category: 'vegetables', addedBy: '' });
+      // hiding form
       setShowForm(false);
     }
   };
 
+  // delete fridge item
   const deleteFridgeItem = (id) => {
     setFridgeItems(fridgeItems.filter(item => item.id !== id));
   };
 
+  //eaten/used
   const markAsConsumed = (item) => {
     setConsumedItems([...consumedItems, { ...item, consumedDate: new Date().toISOString() }]);
     setFridgeItems(fridgeItems.filter(i => i.id !== item.id));
   };
 
+  //add to shopping list
   const addToShoppingList = () => {
     if (shoppingItemName.trim() && shoppingBuyer) {
       const item = {
         id: Date.now(),
         name: shoppingItemName,
         buyer: shoppingBuyer,
-        checked: false
+        checked: false //not bought
       };
       setShoppingList([...shoppingList, item]);
-      setShoppingItemName('');
+      setShoppingItemName(''); //clear
       setShoppingBuyer('');
       setShowShoppingForm(false);
     }
   };
-
+  
+  // checked shopping item
   const toggleShoppingItem = (id) => {
     setShoppingList(shoppingList.map(item => 
       item.id === id ? { ...item, checked: !item.checked } : item
     ));
   };
 
+  //delete shopping item
   const deleteShoppingItem = (id) => {
     setShoppingList(shoppingList.filter(item => item.id !== id));
   };
 
+  //recipe is cooked
   const markRecipeAsCooked = (recipe) => {
     const cookedRecipe = {
       id: Date.now(),
@@ -89,6 +101,7 @@ export default function LeftoverApp() {
     setCookedRecipes([...cookedRecipes, cookedRecipe]);
   };
 
+  //marked collab meal as cooked
   const markCollabMealCooked = (opportunity) => {
     const meal = {
       id: Date.now(),
@@ -98,6 +111,7 @@ export default function LeftoverApp() {
     setCollabMeals([...collabMeals, meal]);
   };
 
+  // add housemate
   const addHousemate = () => {
     if (newMemberName.trim() && currentHousehold) {
       const updatedHousehold = {
@@ -113,6 +127,7 @@ export default function LeftoverApp() {
     }
   };
 
+  //remove housemate
   const removeHousemate = (memberName) => {
     if (confirm(`remove ${memberName} from the house?`)) {
       const updatedHousehold = {
@@ -126,6 +141,7 @@ export default function LeftoverApp() {
     }
   };
 
+  //calculate days until expiry
   const getDaysUntilExpiry = (expiryDate) => {
     if (!expiryDate) return null;
     const today = new Date();
@@ -135,6 +151,7 @@ export default function LeftoverApp() {
     return diffDays;
   };
 
+  // colour based on how many days until expiry
   const getExpiryColor = (days) => {
     if (days === null) return 'bg-gray-100 text-gray-700';
     if (days < 0) return 'bg-red-100 text-red-700';
@@ -143,6 +160,7 @@ export default function LeftoverApp() {
     return 'bg-green-100 text-green-700';
   };
 
+  //icons
   const getCategoryIcon = (category) => {
     const icons = {
       vegetables: Salad,
@@ -156,39 +174,46 @@ export default function LeftoverApp() {
     return <Icon className="w-5 h-5" />;
   };
 
+  //food labels
   const categories = ['vegetables', 'fruits', 'dairy', 'meat', 'grains', 'other'];
 
+    // calculate dashboard metrics
   const calculateMetrics = () => {
+    //consumed within 3 days of expiry
     const itemsSaved = consumedItems.filter(item => {
       const days = getDaysUntilExpiry(item.expiryDate);
       return days !== null && days <= 3 && days >= 0;
     }).length;
 
-    const totalConsumed = consumedItems.length;
-    const moneySaved = itemsSaved * 5;
-    const co2Saved = itemsSaved * 2.5;
+    const totalConsumed = 0;
+    const moneySaved = 0; // $5 per item
+    const co2Saved = 0; // 2.5kg per item
     const recipesCookedCount = cookedRecipes.length;
     const collabMealsCount = collabMeals.length;
 
     return { itemsSaved, moneySaved, co2Saved, totalConsumed, recipesCookedCount, collabMealsCount };
   };
 
+  //add member empty for signup
   const addTempMember = () => {
     setTempMembers([...tempMembers, '']);
   };
 
+  //updates members
   const updateTempMember = (index, value) => {
     const updated = [...tempMembers];
     updated[index] = value;
     setTempMembers(updated);
   };
 
+  //removes members name
   const removeTempMember = (index) => {
     if (tempMembers.length > 1) {
       setTempMembers(tempMembers.filter((_, i) => i !== index));
     }
   };
 
+  //create setup of house
   const completeSignup = () => {
     const validMembers = tempMembers.filter(m => m.trim() !== '');
     if (validMembers.length > 0) {
@@ -205,14 +230,14 @@ export default function LeftoverApp() {
     }
   };
 
-
+  //sign-up
   if (!currentHousehold && signupStep === 'houseName') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-4 flex items-center justify-center" style={{ fontFamily: "'Poppins', sans-serif" }}>
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-[#B8D4A8] rounded-full mb-4 shadow-lg">
-              <Home className="w-10 h-10 text-gray-800" />
+              <Home className="w-10 h-10 text-black" />
             </div>
             <h1 className="text-5xl font-black mb-2" style={{ 
               background: 'linear-gradient(135deg, #7FA86F 0%, #6B9A5E 100%)',
@@ -222,17 +247,16 @@ export default function LeftoverApp() {
               letterSpacing: '-0.02em',
               fontWeight: '900'
             }}>leftover</h1>
-            <p className="text-gray-600 font-medium">Share food, save money, cook together</p>
           </div>
 
           <div>
-            <h2 className="text-xl font-bold mb-4 text-gray-800">What's your house name?</h2>
+            <h2 className="text-xl font-bold mb-4 text-black">What's your house name?</h2>
             
             <input
               type="text"
               value={houseName}
               onChange={(e) => setHouseName(e.target.value)}
-              placeholder="E.g., Unit 5, Oak House"
+              placeholder="Name"
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg mb-4 focus:outline-none focus:border-[#6B9A5E] focus:ring-2 focus:ring-[#6B9A5E]/20"
               autoFocus
             />
@@ -244,7 +268,7 @@ export default function LeftoverApp() {
                 }
               }}
               disabled={!houseName.trim()}
-              className="w-full bg-[#B8D4A8] text-gray-800 py-3 rounded-lg font-bold transition disabled:bg-gray-300 disabled:cursor-not-allowed hover:shadow-lg transform hover:scale-[1.02]"
+              className="w-full bg-[#B8D4A8] text-black py-3 rounded-lg font-bold transition disabled:bg-gray-300 disabled:cursor-not-allowed hover:shadow-lg transform hover:scale-[1.02]"
             >
               Next
             </button>
@@ -254,15 +278,16 @@ export default function LeftoverApp() {
     );
   }
 
+  // add members
   if (!currentHousehold && signupStep === 'members') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-4 flex items-center justify-center" style={{ fontFamily: "'Poppins', sans-serif" }}>
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-[#B8D4A8] rounded-full mb-4 shadow-lg">
-              <Users className="w-10 h-10 text-gray-800" />
+              <Users className="w-10 h-10 text-black" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">{houseName}</h1>
+            <h1 className="text-2xl font-bold text-black mb-2">{houseName}</h1>
             <p className="text-gray-600 font-medium">Who lives here?</p>
           </div>
 
@@ -306,7 +331,7 @@ export default function LeftoverApp() {
             <button
               onClick={completeSignup}
               disabled={tempMembers.filter(m => m.trim()).length === 0}
-              className="flex-1 bg-[#B8D4A8] text-gray-800 py-3 rounded-lg font-bold transition disabled:bg-gray-300 disabled:cursor-not-allowed hover:shadow-lg transform hover:scale-[1.02]"
+              className="flex-1 bg-[#B8D4A8] text-black py-3 rounded-lg font-bold transition disabled:bg-gray-300 disabled:cursor-not-allowed hover:shadow-lg transform hover:scale-[1.02]"
             >
               Start
             </button>
@@ -316,6 +341,7 @@ export default function LeftoverApp() {
     );
   }
 
+  // navigation
   const NavBar = () => (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-100 px-4 py-3 flex justify-around items-center shadow-lg">
       <button
@@ -323,63 +349,57 @@ export default function LeftoverApp() {
         className={`flex flex-col items-center gap-1 ${currentView === 'dashboard' ? 'text-[#6B9A5E]' : 'text-gray-400'}`}
       >
         <Home className="w-6 h-6" />
-        <span className="text-xs font-bold">Dashboard</span>
       </button>
       <button
         onClick={() => setCurrentView('fridge')}
         className={`flex flex-col items-center gap-1 ${currentView === 'fridge' ? 'text-[#6B9A5E]' : 'text-gray-400'}`}
       >
         <Package className="w-6 h-6" />
-        <span className="text-xs font-bold">Fridge</span>
       </button>
       <button
         onClick={() => setCurrentView('shopping')}
         className={`flex flex-col items-center gap-1 ${currentView === 'shopping' ? 'text-[#6B9A5E]' : 'text-gray-400'}`}
       >
         <ShoppingCart className="w-6 h-6" />
-        <span className="text-xs font-bold">Shopping</span>
       </button>
       <button
         onClick={() => setCurrentView('recipes')}
         className={`flex flex-col items-center gap-1 ${currentView === 'recipes' ? 'text-[#6B9A5E]' : 'text-gray-400'}`}
       >
         <ChefHat className="w-6 h-6" />
-        <span className="text-xs font-bold">Recipes</span>
       </button>
       <button
         onClick={() => setCurrentView('collab')}
         className={`flex flex-col items-center gap-1 ${currentView === 'collab' ? 'text-[#6B9A5E]' : 'text-gray-400'}`}
       >
         <Users className="w-6 h-6" />
-        <span className="text-xs font-bold">Collab</span>
       </button>
       <button
         onClick={() => setCurrentView('settings')}
         className={`flex flex-col items-center gap-1 ${currentView === 'settings' ? 'text-[#6B9A5E]' : 'text-gray-400'}`}
       >
         <Settings className="w-6 h-6" />
-        <span className="text-xs font-bold">Settings</span>
       </button>
     </nav>
   );
 
-
+//dashboard front
   if (currentView === 'dashboard') {
     const metrics = calculateMetrics();
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 pb-20" style={{ fontFamily: "'Poppins', sans-serif" }}>
-        <div className="bg-[#B8D4A8] text-gray-800 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-green-50  pb-20" style={{ fontFamily: "'Poppins', sans-serif" }}>
+        <div className="bg-[#6B9A5E] text-black p-6">
           <div className="flex items-center gap-3 mb-2">
             <Home className="w-6 h-6" />
             <h1 className="text-2xl font-bold" >{currentHousehold.name}</h1>
           </div>
-          <p className="text-gray-700 text-sm" >Your household overview</p>
+          <p className="text-black text-sm" >Your household dashboard</p>
         </div>
 
         <div className="max-w-2xl mx-auto px-4 mt-6 space-y-4">
-          <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl p-5 border-2 border-[#B8D4A8]">
-            <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl p-5 border-2 border-[#6B9A5E]">
+            <h3 className="font-bold text-black mb-3 flex items-center gap-2">
               <Leaf className="w-5 h-5 text-[#6B9A5E]" />
               Sustainability Tips
             </h3>
@@ -390,7 +410,7 @@ export default function LeftoverApp() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#6B9A5E] font-bold">•</span>
-                <span>Cook together to save money & energy</span>
+                <span>Cook together to reduce food waste</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#6B9A5E] font-bold">•</span>
@@ -398,7 +418,11 @@ export default function LeftoverApp() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#6B9A5E] font-bold">•</span>
-                <span>Plan meals using what's in the fridge</span>
+                <span>Be thoughtful about what you buy</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#6B9A5E] font-bold">•</span>
+                <span>Choose sustainable options whenever possible</span>
               </li>
             </ul>
           </div>
@@ -410,22 +434,22 @@ export default function LeftoverApp() {
             </h2>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-green-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-2">Items Saved</p>
+                <p className="text-sm text-black mb-2">Food Items Saved</p>
                 <p className="text-3xl font-bold text-green-700">{metrics.itemsSaved}</p>
                 <p className="text-xs text-green-600 mt-1">From expiring</p>
               </div>
               <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-2">Money Saved</p>
+                <p className="text-sm text-black mb-2">Amount of Money Saved</p>
                 <p className="text-3xl font-bold text-blue-700">${metrics.moneySaved}</p>
                 <p className="text-xs text-blue-600 mt-1">Waste prevented</p>
               </div>
               <div className="bg-purple-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-2">CO₂ Reduced</p>
+                <p className="text-sm text-black mb-2">CO₂ Reduced</p>
                 <p className="text-3xl font-bold text-purple-700">{metrics.co2Saved}kg</p>
                 <p className="text-xs text-purple-600 mt-1">Carbon footprint</p>
               </div>
               <div className="bg-orange-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-2">Total Items</p>
+                <p className="text-sm text-black mb-2">Total Food Items</p>
                 <p className="text-3xl font-bold text-orange-700">{metrics.totalConsumed}</p>
                 <p className="text-xs text-orange-600 mt-1">Consumed</p>
               </div>
@@ -433,57 +457,19 @@ export default function LeftoverApp() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md p-5">
-            <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <h3 className="font-bold text-black mb-3 flex items-center gap-2">
               <ChefHat className="w-5 h-5 text-[#6B9A5E]" />
               Cooking Activity
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-yellow-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Recipes Cooked</p>
+                <p className="text-sm text-black mb-1">Recipes Cooked</p>
                 <p className="text-3xl font-bold text-yellow-700">{metrics.recipesCookedCount}</p>
               </div>
               <div className="bg-pink-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Collab Meals</p>
+                <p className="text-sm text-black mb-1">Collab Meals</p>
                 <p className="text-3xl font-bold text-pink-700">{metrics.collabMealsCount}</p>
               </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-md p-5">
-            <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-[#6B9A5E]" />
-              Top Contributors
-            </h3>
-            <div className="space-y-2">
-              {currentHousehold.members && currentHousehold.members.length > 0 ? (
-                currentHousehold.members.map((member, index) => {
-                  const memberItems = consumedItems.filter(item => item.addedBy === member);
-                  const memberSaved = memberItems.filter(item => {
-                    const days = getDaysUntilExpiry(item.expiryDate);
-                    return days !== null && days <= 3 && days >= 0;
-                  }).length;
-                  
-                  return (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#B8D4A8] rounded-full flex items-center justify-center text-gray-800 font-bold text-lg">
-                          {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : member.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium">{member}</p>
-                          <p className="text-xs text-gray-500">{memberSaved} Items Saved</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-[#6B9A5E]">${memberSaved * 5}</p>
-                        <p className="text-xs text-gray-500">Saved</p>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="text-gray-500 text-center py-4">Add housemates to see leaderboard</p>
-              )}
             </div>
           </div>
 
@@ -513,7 +499,7 @@ export default function LeftoverApp() {
                           </div>
                           <div>
                             <p className="font-bold" >{item.name}</p>
-                            <p className="text-sm text-gray-500" >{days} Days Left</p>
+                            <p className="text-sm text-black" >{days} Days Left</p>
                           </div>
                         </div>
                       </div>
@@ -542,25 +528,25 @@ export default function LeftoverApp() {
     );
   }
 
+  // fridge
   if (currentView === 'fridge') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 pb-20" style={{ fontFamily: "'Poppins', sans-serif" }}>
-        <div className="bg-[#B8D4A8] text-gray-800 p-6">
+        <div className="bg-[#B8D4A8] text-black p-6">
           <h1 className="text-2xl font-bold flex items-center gap-2" >
             <Package className="w-6 h-6" />
-            fridge
+            Your fridge
           </h1>
-          <p className="text-gray-700 text-sm" >Manage your shared items</p>
         </div>
 
         <div className="max-w-2xl mx-auto px-4 mt-6">
           <button
             onClick={() => setShowForm(true)}
-            className="w-full bg-[#B8D4A8] text-gray-800 py-3 rounded-lg font-bold mb-4 hover:bg-[#6B9A5E] hover:text-white flex items-center justify-center gap-2"
+            className="w-full bg-[#B8D4A8] text-black py-3 rounded-lg font-bold mb-4 hover:bg-[#6B9A5E] hover:text-white flex items-center justify-center gap-2"
             
           >
             <Plus className="w-5 h-5" />
-            add item
+            Add food
           </button>
 
           {showForm && (
@@ -577,7 +563,7 @@ export default function LeftoverApp() {
                   type="text"
                   value={newItem.name}
                   onChange={(e) => setNewItem({...newItem, name: e.target.value})}
-                  placeholder="Item name"
+                  placeholder="item name"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#6B9A5E]"
                   
                 />
@@ -585,7 +571,7 @@ export default function LeftoverApp() {
                   type="text"
                   value={newItem.quantity}
                   onChange={(e) => setNewItem({...newItem, quantity: e.target.value})}
-                  placeholder="Quantity"
+                  placeholder="quantity"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#6B9A5E]"
                   
                 />
@@ -620,10 +606,10 @@ export default function LeftoverApp() {
 
               <button
                 onClick={addFridgeItem}
-                className="w-full bg-[#B8D4A8] text-gray-800 py-3 rounded-lg font-bold mt-4 hover:bg-[#6B9A5E] hover:text-white"
+                className="w-full bg-[#B8D4A8] text-black py-3 rounded-lg font-bold mt-4 hover:bg-[#6B9A5E] hover:text-white"
                 
               >
-                add to fridge
+                Add to fridge
               </button>
             </div>
           )}
@@ -632,7 +618,6 @@ export default function LeftoverApp() {
             <div className="bg-white rounded-2xl shadow-md p-8 text-center">
               <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500" >No Items in fridge</p>
-              <p className="text-sm text-gray-400 mt-2" >Add your first item to get started</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -686,31 +671,31 @@ export default function LeftoverApp() {
     );
   }
 
+  // shopping list
   if (currentView === 'shopping') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 pb-20" style={{ fontFamily: "'Poppins', sans-serif" }}>
-        <div className="bg-[#B8D4A8] text-gray-800 p-6">
+        <div className="bg-[#B8D4A8] text-black p-6">
           <h1 className="text-2xl font-bold flex items-center gap-2" >
             <ShoppingCart className="w-6 h-6" />
-            shopping list
+            Shopping list
           </h1>
-          <p className="text-gray-700 text-sm" >Track who buys what</p>
         </div>
 
         <div className="max-w-2xl mx-auto px-4 mt-6">
           <button
             onClick={() => setShowShoppingForm(true)}
-            className="w-full bg-[#B8D4A8] text-gray-800 py-3 rounded-lg font-bold mb-4 hover:bg-[#6B9A5E] hover:text-white flex items-center justify-center gap-2"
+            className="w-full bg-[#B8D4A8] text-black py-3 rounded-lg font-bold mb-4 hover:bg-[#6B9A5E] hover:text-white flex items-center justify-center gap-2"
             
           >
             <Plus className="w-5 h-5" />
-            add item
+            Add food
           </button>
 
           {showShoppingForm && (
             <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold" >New Item</h3>
+                <h3 className="text-lg font-bold" >New Food Item</h3>
                 <button onClick={() => setShowShoppingForm(false)} className="text-gray-500 hover:text-gray-700">
                   <X className="w-5 h-5" />
                 </button>
@@ -721,7 +706,7 @@ export default function LeftoverApp() {
                   type="text"
                   value={shoppingItemName}
                   onChange={(e) => setShoppingItemName(e.target.value)}
-                  placeholder="Item name"
+                  placeholder="name"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#6B9A5E]"
                   
                 />
@@ -740,10 +725,10 @@ export default function LeftoverApp() {
 
               <button
                 onClick={addToShoppingList}
-                className="w-full bg-[#B8D4A8] text-gray-800 py-3 rounded-lg font-bold mt-4 hover:bg-[#6B9A5E] hover:text-white"
+                className="w-full bg-[#B8D4A8] text-black py-3 rounded-lg font-bold mt-4 hover:bg-[#6B9A5E] hover:text-white"
                 
               >
-                add to list
+                Add to shopping list
               </button>
             </div>
           )}
@@ -766,7 +751,7 @@ export default function LeftoverApp() {
                           item.checked ? 'bg-gradient-to-r from-[#9CAF88] to-[#7D9A6F] border-[#9CAF88]' : 'border-gray-300'
                         }`}
                       >
-                        {item.checked && <Check className="w-4 h-4 text-gray-800" />}
+                        {item.checked && <Check className="w-4 h-4 text-black" />}
                       </button>
                       <div className="flex-1">
                         <p className={`font-bold ${item.checked ? 'line-through text-gray-400' : ''}`} >
@@ -792,6 +777,7 @@ export default function LeftoverApp() {
     );
   }
 
+  //suggested recipes
   if (currentView === 'recipes') {
     const expiringItems = fridgeItems.filter(item => {
       const days = getDaysUntilExpiry(item.expiryDate);
@@ -809,7 +795,7 @@ export default function LeftoverApp() {
         difficulty: 'easy'
       },
       {
-        name: 'pasta dish',
+        name: 'Pasta',
         matches: expiringItems.filter(item => 
           ['grains', 'vegetables', 'dairy'].includes(item.category)
         ).length,
@@ -818,7 +804,7 @@ export default function LeftoverApp() {
         difficulty: 'easy'
       },
       {
-        name: 'smoothie',
+        name: 'Smoothie',
         matches: expiringItems.filter(item => 
           ['fruits', 'dairy'].includes(item.category)
         ).length,
@@ -827,7 +813,7 @@ export default function LeftoverApp() {
         difficulty: 'easy'
       },
       {
-        name: 'soup',
+        name: 'Soup',
         matches: expiringItems.filter(item => 
           ['vegetables', 'grains'].includes(item.category)
         ).length,
@@ -839,12 +825,11 @@ export default function LeftoverApp() {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 pb-20" style={{ fontFamily: "'Poppins', sans-serif" }}>
-        <div className="bg-[#B8D4A8] text-gray-800 p-6">
+        <div className="bg-[#B8D4A8] text-black p-6">
           <h1 className="text-2xl font-bold flex items-center gap-2" >
             <ChefHat className="w-6 h-6" />
-            recipe ideas
+            Suggested recipes
           </h1>
-          <p className="text-gray-700 text-sm" >Use expiring Items</p>
         </div>
 
         <div className="max-w-2xl mx-auto px-4 mt-6">
@@ -852,7 +837,7 @@ export default function LeftoverApp() {
             <div className="bg-white rounded-2xl shadow-md p-8 text-center">
               <ChefHat className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500" >No expiring Items</p>
-              <p className="text-sm text-gray-400 mt-2" >Add Items to get recipe suggestions</p>
+              <p className="text-sm text-gray-400 mt-2" >Add food to get recipe suggestions</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -862,7 +847,7 @@ export default function LeftoverApp() {
                   <div key={index} className="bg-white rounded-2xl shadow-lg p-5">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h3 className="text-xl font-bold text-gray-800" >{recipe.name}</h3>
+                        <h3 className="text-xl font-bold text-black" >{recipe.name}</h3>
                         <div className="flex gap-2 mt-2">
                           <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded" >
                             {recipe.time}
@@ -872,9 +857,6 @@ export default function LeftoverApp() {
                           </span>
                         </div>
                       </div>
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold" >
-                        {recipe.matches} Items
-                      </span>
                     </div>
                     
                     <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-4">
@@ -897,11 +879,11 @@ export default function LeftoverApp() {
                       className={`w-full py-3 rounded-lg font-bold transition ${
                         alreadyCooked 
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                          : 'bg-[#B8D4A8] text-gray-800 hover:bg-[#6B9A5E] hover:text-white'
+                          : 'bg-[#B8D4A8] text-black hover:bg-[#6B9A5E] hover:text-white'
                       }`}
                       
                     >
-                      {alreadyCooked ? 'cooked' : 'mark as cooked'}
+                      {alreadyCooked ? 'Cooked' : 'Mark as cooked'}
                     </button>
                   </div>
                 );
@@ -914,7 +896,7 @@ export default function LeftoverApp() {
     );
   }
 
-  // Cook Together View
+  // Cook together
   if (currentView === 'collab') {
     const userItems = {};
     fridgeItems.forEach(item => {
@@ -943,7 +925,7 @@ export default function LeftoverApp() {
             const opp = {
               recipe: 'Stir Fry',
               users: [user1, user2],
-              description: `combine vegetables and meat`,
+              description: `Combine vegetables and meat`,
               savings: '$12'
             };
             const alreadyCooked = collabMeals.some(cm => cm.recipe === opp.recipe && 
@@ -953,9 +935,9 @@ export default function LeftoverApp() {
           
           if (categories1.includes('grains') && categories2.includes('vegetables')) {
             const opp = {
-              recipe: 'Pasta Primavera',
+              recipe: 'Pasta',
               users: [user1, user2],
-              description: `pasta with fresh vegetables`,
+              description: `Pasta with fresh vegetables`,
               savings: '$10'
             };
             const alreadyCooked = collabMeals.some(cm => cm.recipe === opp.recipe && 
@@ -967,7 +949,7 @@ export default function LeftoverApp() {
             const opp = {
               recipe: 'Smoothie Bowl',
               users: [user1, user2],
-              description: `make smoothies together`,
+              description: `Make smoothies together`,
               savings: '$6'
             };
             const alreadyCooked = collabMeals.some(cm => cm.recipe === opp.recipe && 
@@ -976,27 +958,15 @@ export default function LeftoverApp() {
           }
         }
       }
-      
-      if (opportunities.length === 0 && users.length >= 2) {
-        const opp = {
-          recipe: 'Mixed Leftovers',
-          users: users.slice(0, 2),
-          description: 'combine Ingredients creatively',
-          savings: '$10'
-        };
-        const alreadyCooked = collabMeals.some(cm => cm.recipe === opp.recipe);
-        opportunities.push({ ...opp, alreadyCooked });
-      }
     }
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 pb-20" style={{ fontFamily: "'Poppins', sans-serif" }}>
-        <div className="bg-[#B8D4A8] text-gray-800 p-6">
+        <div className="bg-[#B8D4A8] text-black p-6">
           <h1 className="text-2xl font-bold flex items-center gap-2" >
             <Users className="w-6 h-6" />
-            cook together
+            Cook together
           </h1>
-          <p className="text-gray-700 text-sm" >Save money with housemates</p>
         </div>
 
         <div className="max-w-2xl mx-auto px-4 mt-6">
@@ -1015,19 +985,19 @@ export default function LeftoverApp() {
               {opportunities.map((opp, index) => (
                 <div key={index} className="bg-white rounded-2xl shadow-lg p-5">
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-xl font-bold text-gray-800" >{opp.recipe}</h3>
+                    <h3 className="text-xl font-bold text-black" >{opp.recipe}</h3>
                     <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold" >
-                      save {opp.savings}
+                      Save {opp.savings}
                     </span>
                   </div>
                   
                   <p className="text-sm text-gray-600 mb-4" >{opp.description}</p>
                   
                   <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 mb-4">
-                    <p className="text-sm font-semibold text-gray-700 mb-3" >Housemates:</p>
+                    <p className="text-sm font-semibold text-black mb-3" >Housemates:</p>
                     <div className="flex flex-wrap gap-2">
                       {opp.users.map((user, i) => (
-                        <div key={i} className="bg-gradient-to-r from-[#9CAF88] to-[#7D9A6F]/20 text-[#6B9A5E] px-4 py-2 rounded-full">
+                        <div key={i} className="bg-green-200 text-[#000000] px-4 py-2 rounded-full">
                           <div className="text-sm font-bold" >{user}</div>
                           <div className="text-xs" >
                             {userCategories[user]?.length || 0} Ingredients
@@ -1038,8 +1008,8 @@ export default function LeftoverApp() {
                   </div>
 
                   <div className="flex gap-2 text-xs mb-3">
-                    <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full" >Split Costs</span>
-                    <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full" >Cook Together</span>
+                    <span className="bg-green-50 text-green-700 px-3 py-1 rounded-full" >Split costs</span>
+                    <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full" >Cook together</span>
                   </div>
 
                   <button
@@ -1048,11 +1018,11 @@ export default function LeftoverApp() {
                     className={`w-full py-3 rounded-lg font-bold transition ${
                       opp.alreadyCooked 
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                        : 'bg-[#B8D4A8] text-gray-800 hover:bg-[#6B9A5E] hover:text-white'
+                        : 'bg-[#B8D4A8] text-black hover:bg-[#6B9A5E] hover:text-white'
                     }`}
                     
                   >
-                    {opp.alreadyCooked ? 'already cooked together' : 'mark as cooked together'}
+                    {opp.alreadyCooked ? 'Already cooked together' : 'Mark as cooked together'}
                   </button>
                 </div>
               ))}
@@ -1064,16 +1034,15 @@ export default function LeftoverApp() {
     );
   }
 
-  // Settings View
+  // settings
   if (currentView === 'settings') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 pb-20" style={{ fontFamily: "'Poppins', sans-serif" }}>
-        <div className="bg-[#B8D4A8] text-gray-800 p-6">
+        <div className="bg-[#B8D4A8] text-black p-6">
           <h1 className="text-2xl font-bold flex items-center gap-2" >
             <Settings className="w-6 h-6" />
-            settings
+            Settings
           </h1>
-          <p className="text-gray-700 text-sm" >manage {currentHousehold.name}</p>
         </div>
 
         <div className="max-w-2xl mx-auto px-4 mt-6 space-y-4">
@@ -1082,7 +1051,7 @@ export default function LeftoverApp() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold flex items-center gap-2" >
                 <Home className="w-5 h-5 text-[#6B9A5E]" />
-                house name
+                House name
               </h2>
             </div>
             <p className="text-2xl font-bold text-[#6B9A5E]" >{currentHousehold.name}</p>
@@ -1093,15 +1062,15 @@ export default function LeftoverApp() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold flex items-center gap-2" >
                 <Users className="w-5 h-5 text-[#6B9A5E]" />
-                housemates ({currentHousehold.members?.length || 0})
+                Housemates
               </h2>
               <button
                 onClick={() => setShowAddMember(true)}
-                className="bg-[#B8D4A8] text-gray-800 px-4 py-2 rounded-lg hover:bg-[#6B9A5E] hover:text-white text-sm flex items-center gap-1 font-bold"
+                className="bg-[#B8D4A8] text-black px-4 py-2 rounded-lg hover:bg-[#6B9A5E] hover:text-white text-sm flex items-center gap-1 font-bold"
                 
               >
                 <Plus className="w-4 h-4" />
-                add
+                Add
               </button>
             </div>
 
@@ -1117,7 +1086,7 @@ export default function LeftoverApp() {
                   autoFocus
                 />
                 <div className="flex gap-2">
-                  <button onClick={addHousemate} className="flex-1 bg-[#B8D4A8] text-gray-800 py-2 rounded-lg hover:bg-[#6B9A5E] hover:text-white font-bold" >
+                  <button onClick={addHousemate} className="flex-1 bg-[#B8D4A8] text-black py-2 rounded-lg hover:bg-[#6B9A5E] hover:text-white font-bold" >
                     add
                   </button>
                   <button onClick={() => { setShowAddMember(false); setNewMemberName(''); }} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-bold" >
@@ -1154,23 +1123,6 @@ export default function LeftoverApp() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md p-5">
-            <h2 className="text-lg font-bold mb-3 flex items-center gap-2" >
-              <TrendingUp className="w-5 h-5 text-[#6B9A5E]" />
-              quick stats
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600" >Fridge items</p>
-                <p className="text-2xl font-bold text-blue-700">{fridgeItems.length}</p>
-              </div>
-              <div className="bg-green-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600" >Shopping</p>
-                <p className="text-2xl font-bold text-green-700">{shoppingList.length}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-md p-5">
             <button
               onClick={() => {
                 if (confirm('leave house?')) {
@@ -1180,7 +1132,7 @@ export default function LeftoverApp() {
               className="w-full bg-red-50 text-red-700 py-3 rounded-lg hover:bg-red-100 font-bold"
               
             >
-              leave house
+              Leave house
             </button>
           </div>
         </div>
